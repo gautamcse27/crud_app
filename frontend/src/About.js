@@ -69,7 +69,17 @@ const About = () => {
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.photo ? 'Available' : 'N/A'}</td>
+              <td>
+            {user.photo ? (
+            <img
+            src={`data:image/jpeg;base64,${user.photo}`}
+            alt="User Photo"
+            style={{ width: '80px', height: '100px', borderRadius: '0%' }}
+            />
+    ) : (
+        'N/A'
+    )}
+</td>
             </tr>
           ))}
         </tbody>
