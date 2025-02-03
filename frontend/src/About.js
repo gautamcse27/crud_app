@@ -40,7 +40,11 @@ const handleUsersPerPageChange =(e)=>{
 
     // Fetch user data
     const usersWithPhotos = await axios.get('http://localhost:8000/users');
-
+    doc.setFontSize(18);
+    doc.text('User List with Photos', 14, 20);
+    doc.setFontSize(12);
+    doc.text('Below is the list of users with their photos:', 14, 30);
+    const startY = 40;
     // Prepare table data
     const tableData = usersWithPhotos.data.map((user, index) => [
         index + 1, 
@@ -52,6 +56,7 @@ const handleUsersPerPageChange =(e)=>{
 
     // Add table headers and content
     autoTable(doc, {
+       
         head: [['S.No', 'ID', 'Name', 'Email', 'Photo']],
         body: tableData,
         didDrawCell: (data) => {
@@ -64,7 +69,7 @@ const handleUsersPerPageChange =(e)=>{
                 }
             }
         },
-        startY: 20,
+        startY,
         margin: { top: 10 },
         styles: { cellPadding: 5, fontSize: 10, overflow: 'linebreak' },
     });
