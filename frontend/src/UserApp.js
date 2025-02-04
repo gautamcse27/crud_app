@@ -6,6 +6,9 @@ const UserApp = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [mobile, setMobile] = useState('');
+    const [qualification, setQualification] = useState('');
+    const [address, setAddress] = useState('');
+    const [workExperience, setWorkExperience] = useState('');
     const [photo, setPhoto] = useState(null);
     const [pdfFile, setPdfFile] = useState(null);
     const [editId, setEditId] = useState(null);
@@ -22,13 +25,20 @@ const UserApp = () => {
         fetchUsers();
     }, []);
 
+    
+
     // Create or update a user
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+
         const formData=new FormData();
         formData.append('name', name);
         formData.append('email',email);
         formData.append('mobile',mobile);
+        formData.append('qualification', qualification);
+        formData.append('address', address);
+        formData.append('work_experience', workExperience);
         if (photo){
           formData.append('photo', photo);
         if (pdfFile) formData.append('pdf', pdfFile);
@@ -39,19 +49,30 @@ const UserApp = () => {
                 headers:{'Content-Type': 'multipart/form-data'},
             });
         } else {
-            await axios.post('http://localhost:8000/users', formData,{
+            const response =await axios.post('http://localhost:8000/users', formData,{
                 headers: {'Content-Type': 'multipart/form-data'},
             });
+            if (response.data.error){
+                alert(response.data.error);
+                return;
+            }
         }
         setName('');
         setEmail('');
         setMobile('');
+        setQualification('');
+        setAddress('');
+        setWorkExperience('');
         setPhoto(null);
         setPdfFile(null);
         setEditId(null);
         fetchUsers();
     } catch (err) {
+        if(err.response && err.response.data.error){
+            alert(err.response.data.error);
+        }else{
       console.error(err);
+        }
   }
     };
 
@@ -65,9 +86,10 @@ const UserApp = () => {
     const editUser = (user) => {
         setName(user.name);
         setEmail(user.email);
-        setMobile(user.mobile);
-        setPhoto(user.photo);
-        setPdfFile(user.pdf);
+        setMobile(user.mobile || '');
+        setQualification(user.qualification || '');
+        setAddress(user.address || '');
+         setWorkExperience(user.work_experience || '');
         setEditId(user.id);
     };
     const indexOfLastUser = currentPage*usersPerPage;
@@ -81,7 +103,8 @@ const UserApp = () => {
                 <div className="col-md-6">
                     <form onSubmit={handleSubmit} className="card p-4 shadow">
                         <h2 className="text-center mb-4">{editId ? 'Edit User' : 'Add User'}</h2>
-                        <div className="mb-3">
+                        <div className="row mb-3">
+                        <div className="col-md-6">
                             <label htmlFor="name" className="form-label">Name</label>
                             <input
                                 type="text"
@@ -90,9 +113,10 @@ const UserApp = () => {
                                 placeholder="Enter name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                required
                             />
                         </div>
-                        <div className="mb-3">
+                        <div className="col-md-6">
                             <label htmlFor="email" className="form-label">Email</label>
                             <input
                                 type="email"
@@ -101,10 +125,12 @@ const UserApp = () => {
                                 placeholder="Enter email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
                         </div>
-                       
-                        <div className="mb-3">
+                        </div>
+                        <div className="row mb-3">
+                        <div className="col-md-6">
                           <label className="form-label">Mobile Number</label>
                           <input
                                type="tel"
@@ -112,8 +138,42 @@ const UserApp = () => {
                                placeholder="Enter mobile number"
                                value={mobile}
                                  onChange={(e) => setMobile(e.target.value)}
+                                 required
                                  pattern="[0-9]{10}"
                               maxLength="10"
+                            />
+                        </div>
+                        <div className="col-md-6">
+                         <label className="form-label">Qualification</label>
+                         <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Enter Qualification"
+                               value={qualification}
+                               onChange={(e) => setQualification(e.target.value)}
+                               required
+                         />
+                        </div>
+                        </div>
+                        <div className="mb-3">
+                             <label className="form-label">Address</label>
+                              <textarea
+                             className="form-control"
+                             placeholder="Enter Address"
+                                value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                            />
+                        </div>
+                        <div className="mb-3">
+                           <label className="form-label">Work Experience(in Years)</label>
+                          <input
+                             type="text"
+                               className="form-control"
+                               placeholder="No of years"
+                            value={workExperience}
+                           onChange={(e) => setWorkExperience(e.target.value)}
+                           required
                             />
                         </div>
                         <div className="mb-3">
@@ -123,6 +183,7 @@ const UserApp = () => {
                                 className="form-control"
                                 id="photo"
                                 onChange={(e) => setPhoto(e.target.files[0])}
+                                required
                             />
                         </div>
                         <div className="mb-3">
@@ -132,6 +193,7 @@ const UserApp = () => {
                                  className="form-control"
                                 accept="application/pdf"
                                 onChange={(e) => setPdfFile(e.target.files[0])}
+                                required
                             />
                         </div>
                         <button type="submit" className="btn btn-primary w-100">
@@ -151,6 +213,9 @@ const UserApp = () => {
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Mobile</th>
+                                <th>Qualification</th>
+                                <th>Address</th>
+                                <th>Work Experience</th>
                                 <th>Photo</th>
                                 <th>Certificate</th>
                                 <th>Actions</th>
@@ -164,6 +229,9 @@ const UserApp = () => {
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
                                     <td>{user.mobile}</td>
+                                    <td>{user.qualification}</td>
+                                    <td>{user.address}</td>
+                                    <td>{user.work_experience}</td>
                                     <td>
                                         {user.photo && (
                                             <img
