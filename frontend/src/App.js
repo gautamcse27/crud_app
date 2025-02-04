@@ -39,7 +39,7 @@ const App = () => {
                             </li>
                             <li className="nav-item">
                                 <Link to="/about" className="nav-link">
-                                    About
+                                    Report
                                 </Link>
                             </li>
                             <li className="nav-item">
