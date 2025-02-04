@@ -13,13 +13,13 @@ app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 // PostgreSQL connection
 const pool = new Pool({
-    user: 'crud_user1',
+    user: 'crud_user',
     host: 'localhost',
     database: 'crud_app',
     password: 'crud@123',
     port: 5432,
 });
-const storage = multer.memoryStorage(); // Store file in memory as Buffer
+ 
 const upload = multer({ 
     storage: multer.memoryStorage(),
     limits:{
@@ -35,23 +35,26 @@ app.post('/users',
         {name: 'pdf', maxCount:1}
     ]),
      async (req, res) => {
-    const { name, email, mobile } = req.body;
+    const { name, email, mobile,qualification, address, work_experience} = req.body;
     const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
     const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
-    if (!mobile) {
-        return res.status(400).json({ error: 'Mobile number is required' });
-    }
-    if (mobile) {
-        // Check if mobile has exactly 10 digits
-        if (!/^\d{10}$/.test(mobile)) {
-            return res.status(400).json({ error: 'Mobile number must be 10 digits' });
-        }
-    }
+    if (!name || !email || !mobile || !qualification|| !address|| !work_experience|| !req.files) {
+        return res.status(400).json({ message: 'All fields (name, email, photo) are required.' });
+      }
     try {
+        const existingUser = await pool.query(
+            'SELECT * FROM users WHERE mobile = $1',
+            [mobile]
+        );
+        if (existingUser.rows.length>0){
+            return res.status(400).json({error: 'Mobile Number already exists'})
+        };
+
+
         const result = await pool.query(
-            'INSERT INTO users (name, email,mobile,photo, pdf) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            'INSERT INTO users (name, email, mobile, qualification, address, work_experience, photo, pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
             [
-                name, email, mobile,
+                name, email, mobile,qualification, address, work_experience,
                  photoFile ? photoFile.buffer.toString('base64') : null,
                  pdfFile ? pdfFile.buffer.toString('base64'): null
                 ]
@@ -93,22 +96,44 @@ app.get('/users/:id', async (req, res) => {
 });
 
 // Update a user
-app.put('/users/:id',upload.single('photo'), async (req, res) => {
+app.put('/users/:id',upload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'pdf', maxCount: 1 }
+]), 
+    async (req, res) => {
     const { id } = req.params;
-    const { name, email, mobile } = req.body;
-    const photo = req.file ? req.file.buffer.toString('base64'):null;
-    const pdf= req.file ?  req.file.buffer.toString('base64'): null;
+    const { name, email, mobile, qualification, address, work_experience } = req.body;
+    const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
+    const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
     if (mobile && !/^\d{10}$/.test(mobile)) {
         return res.status(400).json({ error: 'Invalid mobile number format' });
     }
+
+
     try {
-        const result = await pool.query(
-            'UPDATE users SET name = $1, email = $2,mobile= $3, photo= COALESCE($4, photo), pdf= COALESCE($5, pdf)  WHERE id = $6 RETURNING *',
-            [name, email,mobile,photo,pdf, id]
+        const existingUser = await pool.query(
+            'SELECT * FROM users WHERE id = $1',
+            [id]
         );
-        if (result.rows.length === 0) {
-            return res.status(404).send('User not found');
+
+        if (existingUser.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
         }
+
+        const updatedName = name || existingUser.rows[0].name;
+        const updatedEmail = email || existingUser.rows[0].email;
+        const updatedMobile = mobile || existingUser.rows[0].mobile;
+        const updateQualification= qualification || existingUser.rows[0].qualification;
+        const updatedAddress = address || existingUser.rows[0].address;
+        const updatedWork_experience= work_experience || existingUser.rows[0].work_experience;
+        const updatedPhoto = photoFile ? photoFile.buffer.toString('base64') : existingUser.rows[0].photo;
+        const updatedPdf = pdfFile ? pdfFile.buffer.toString('base64') : existingUser.rows[0].pdf;
+        
+        const result = await pool.query(
+            'UPDATE users SET name = $1, email = $2, mobile= $3, qualification=$4, address=$5, work_experience=$6, photo= COALESCE($7, photo), pdf= COALESCE($8, pdf)  WHERE id = $9 RETURNING *',
+            [updatedName, updatedEmail,updatedMobile,updateQualification,updatedAddress,updatedWork_experience, updatedPhoto,updatedPdf, id]
+        );
+      
         res.status(200).json(result.rows[0]);
     } catch (err) {
         console.error(err);
