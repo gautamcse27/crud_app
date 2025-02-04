@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './Home';
 import About from './About';
 import Contact from './Contact';
-import UserApp from './UserApp'; // Your existing CRUD app
+import UserApp from './UserApp';
+import UserProfile from './UserProfile';
+import SearchUser from './SearchUser'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
@@ -38,6 +40,11 @@ const App = () => {
                                 </Link>
                             </li>
                             <li className="nav-item">
+                                <Link to="/searchuser" className="nav-link">
+                                    Search a User 
+                                </Link>
+                            </li>
+                            <li className="nav-item">
                                 <Link to="/about" className="nav-link">
                                     Report
                                 </Link>
@@ -55,8 +62,10 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/users" element={<UserApp />} />
+                <Route path="/searchuser" element={<SearchUser/>} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/users/:id" element={<UserProfile />} />
             </Routes>
         </Router>
     );
