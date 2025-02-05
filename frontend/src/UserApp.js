@@ -11,6 +11,8 @@ const UserApp = () => {
     const [qualification, setQualification] = useState('');
     const [address, setAddress] = useState('');
     const [workExperience, setWorkExperience] = useState('');
+    const [achievement, setAchievement] = useState('');
+    const [remarks, setRemarks] = useState('');
     const [photo, setPhoto] = useState(null);
     const [pdfFile, setPdfFile] = useState(null);
     const [editId, setEditId] = useState(null);
@@ -41,6 +43,8 @@ const UserApp = () => {
         formData.append('qualification', qualification);
         formData.append('address', address);
         formData.append('work_experience', workExperience);
+        formData.append('achievement', achievement);
+        formData.append('remarks', remarks);
         if (photo){
           formData.append('photo', photo);
         if (pdfFile) formData.append('pdf', pdfFile);
@@ -92,6 +96,8 @@ const UserApp = () => {
         setQualification(user.qualification || '');
         setAddress(user.address || '');
          setWorkExperience(user.work_experience || '');
+         setAchievement(user.achievement || '');
+         setRemarks(user.remarks || '');
         setEditId(user.id);
     };
     const indexOfLastUser = currentPage*usersPerPage;
@@ -168,16 +174,37 @@ const UserApp = () => {
                             />
                         </div>
                         <div className="mb-3">
-                           <label className="form-label">Work Experience(in Years)</label>
+                           <label className="form-label">Work Experience</label>
                           <input
                              type="text"
                                className="form-control"
-                               placeholder="No of years"
+                               placeholder="Mention Work experience"
                             value={workExperience}
                            onChange={(e) => setWorkExperience(e.target.value)}
                            required
                             />
                         </div>
+                        <div className="mb-3">
+                            <label className="form-label">Achievement</label>
+                        <input
+                          type="text"
+                            className="form-control"
+                             placeholder="Received any Prize"
+                        value={achievement}
+                         onChange={(e) => setAchievement(e.target.value)}
+                         required
+                         />
+                    </div>
+                    <div className="mb-3">
+                         <label className="form-label">Remarks</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        required
+                        />
+                    </div>
                         <div className="mb-3">
                             <label htmlFor="photo" className="form-label">Upload Photo ( Max 5MB)</label>
                             <input
@@ -218,9 +245,12 @@ const UserApp = () => {
                                 <th>Qualification</th>
                                 <th>Address</th>
                                 <th>Work Experience</th>
+                                <th>Achievement</th>
+                                <th>Remarks</th>
                                 <th>Photo</th>
                                 <th>Certificate</th>
                                 <th>Actions</th>
+                                <th>Profile</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -234,6 +264,8 @@ const UserApp = () => {
                                     <td>{user.qualification}</td>
                                     <td>{user.address}</td>
                                     <td>{user.work_experience}</td>
+                                    <td>{user.achievement}</td>
+                                    <td>{user.remarks}</td>
                                     <td>
                                         {user.photo && (
                                             <img
