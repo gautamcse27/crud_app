@@ -36,7 +36,7 @@ const handleUsersPerPageChange =(e)=>{
 };
   // Generate PDF
   const generatePDF = async () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape');
 
     // Fetch user data
     const usersWithPhotos = await axios.get('http://localhost:8000/users');
@@ -51,21 +51,28 @@ const handleUsersPerPageChange =(e)=>{
         user.id, 
         user.name, 
         user.email, 
-        user.photo ? '' : 'N/A'
+        user.mobile,
+        user.qualification,
+        user.address,
+        user.work_experience,
+        user.achievement,
+        user.remarks,
+        user.photo ? '' : 'N/A',
+        user.pdf? 'Y': 'N/A'
     ]);
 
     // Add table headers and content
     autoTable(doc, {
        
-        head: [['S.No', 'ID', 'Name', 'Email', 'Photo']],
+        head: [['S.No', 'ID', 'Name', 'Email','Contact','Qualification','Address','Work Experience','Achievement','Remarks','Photo','Certificate']],
         body: tableData,
         didDrawCell: (data) => {
             // Skip the header row by checking row.index existence
-            if (data.section== 'body' && data.column.index === 4) {
+            if (data.section== 'body' && data.column.index === 10) {
                 const user = usersWithPhotos.data[data.row.index];
                 if (user.photo) {
                     const base64Img = `data:image/jpeg;base64,${user.photo}`;
-                    doc.addImage(base64Img, 'JPEG', data.cell.x + 2, data.cell.y + 2, 15, 15);
+                    doc.addImage(base64Img, 'JPEG', data.cell.x + 1, data.cell.y + 1, 10, 10);
                 }
             }
         },
@@ -81,7 +88,7 @@ const handleUsersPerPageChange =(e)=>{
     <div className="container mt-5">
       <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">CRUD App</a>
+          <a className="navbar-brand" href="#">User Management App</a>
           <button className="btn btn-outline-success" onClick={generatePDF}>
             Download PDF
           </button>
@@ -97,6 +104,12 @@ const handleUsersPerPageChange =(e)=>{
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Contact</th>
+            <th>Qualification</th>
+            <th>Address</th>
+            <th>Work Experience</th>
+            <th>Achievement</th>
+            <th>Remarks</th>
             <th>Photo</th>
           </tr>
         </thead>
@@ -108,6 +121,12 @@ const handleUsersPerPageChange =(e)=>{
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
+              <td>{user.mobile}</td>
+              <td>{user.qualification}</td>
+              <td>{user.address}</td>
+              <td>{user.work_experience}</td>
+              <td>{user.achievement}</td>
+              <td>{user.remarks}</td>
               <td>
             {user.photo ? (
             <img
