@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 const UserApp = () => {
@@ -265,6 +267,11 @@ const UserApp = () => {
                                         >
                                             Delete
                                         </button>
+                                    </td>
+                                    <td>
+                                 <Link to={`/users/${user.id}`} className="btn btn-sm btn-info">
+                                  View Profile
+                                 </Link>
                                     </td>
                                 </tr>
                             ))}
