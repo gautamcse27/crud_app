@@ -63,6 +63,12 @@ const UserProfile = () => {
                                 <li className="list-group-item">
                                     <strong>Work Experience:</strong> {user.work_experience}
                                 </li>
+                                <li className="list-group-item">
+                                    <strong>Achievement:</strong> {user.achievement}
+                                </li>
+                                <li className="list-group-item">
+                                    <strong>Remarks:</strong> {user.remarks}
+                                </li>
                             </ul>
                             {user.pdf && (
                                 <div className="mt-4">
