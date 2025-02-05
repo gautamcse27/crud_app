@@ -168,6 +168,7 @@ const UserApp = () => {
                               <textarea
                              className="form-control"
                              placeholder="Enter Address"
+                             rows="3"
                                 value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             required
@@ -212,8 +213,9 @@ const UserApp = () => {
                                 className="form-control"
                                 id="photo"
                                 onChange={(e) => setPhoto(e.target.files[0])}
-                                required
+                                
                             />
+                            <small className="text-muted">Leave blank to keep existing photo</small>
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Upload Certificate (Max 5MB)</label>
@@ -222,8 +224,9 @@ const UserApp = () => {
                                  className="form-control"
                                 accept="application/pdf"
                                 onChange={(e) => setPdfFile(e.target.files[0])}
-                                required
+                                
                             />
+                            <small className="text-muted">Leave blank to keep existing PDF</small>
                         </div>
                         <button type="submit" className="btn btn-primary w-100">
                             {editId ? 'Update' : 'Create'}
