@@ -18,6 +18,8 @@ const UserApp = () => {
     const [editId, setEditId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10); 
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     // Fetch all users
     const fetchUsers = async () => {
@@ -30,7 +32,9 @@ const UserApp = () => {
     }, []);
 
     
-
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
     // Create or update a user
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,15 +58,18 @@ const UserApp = () => {
             await axios.put(`http://localhost:8000/users/${editId}`, formData,{
                 headers:{'Content-Type': 'multipart/form-data'},
             });
+            setMessage('User updated successfully!');
         } else {
             const response =await axios.post('http://localhost:8000/users', formData,{
                 headers: {'Content-Type': 'multipart/form-data'},
             });
+            setMessage('User created successfully!');
             if (response.data.error){
                 alert(response.data.error);
                 return;
             }
         }
+        
         setName('');
         setEmail('');
         setMobile('');
@@ -73,13 +80,13 @@ const UserApp = () => {
         setPdfFile(null);
         setEditId(null);
         fetchUsers();
-    } catch (err) {
-        if(err.response && err.response.data.error){
-            alert(err.response.data.error);
-        }else{
-      console.error(err);
-        }
-  }
+        scrollToTop();
+    } catch (error) {
+        setMessage('Error occurred while processing the request.');
+      } finally {
+        setLoading(false); // Hide spinner
+      }
+  setTimeout(() => setMessage(''), 4000);
     };
 
     // Delete a user
@@ -109,6 +116,8 @@ const UserApp = () => {
             <h1 className="text-center mb-4">User Database Management</h1>
             <div className="row justify-content-center">
                 <div className="col-md-6">
+                {message && <div style={{ background: '#d4edda', color: '#155724', padding: '10px', marginBottom: '10px' }}>{message}</div>}
+                {loading && <div className="spinner">Uploading...</div>}
                     <form onSubmit={handleSubmit} className="card p-4 shadow">
                         <h2 className="text-center mb-4">{editId ? 'Edit User' : 'Add User'}</h2>
                         <div className="row mb-3">
@@ -232,11 +241,24 @@ const UserApp = () => {
                             {editId ? 'Update' : 'Create'}
                         </button>
                     </form>
+                    <style>
+        {`
+          .spinner {
+            margin-top: 10px;
+            color: blue;
+            font-size: 16px;
+          }
+          .alert {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 10px;
+          }
+        `}
+      </style>
                 </div>
             </div>
-
             <div className="row justify-content-center mt-5">
-                <div className="col-md-8">
                     <h2 className="text-center mb-4">User List</h2>
                     <table className="table table-striped table-hover shadow">
                         <thead>
@@ -325,8 +347,7 @@ const UserApp = () => {
                             ))}
                         </ul>
                     </nav>
-                </div>
-            </div>
+                    </div>
         </div>
     );
 };
