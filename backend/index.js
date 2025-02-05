@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 // PostgreSQL connection
 const pool = new Pool({
-    user: 'crud_user',
+    user: 'crud_user1',
     host: 'localhost',
     database: 'crud_app',
     password: 'crud@123',
@@ -35,10 +35,11 @@ app.post('/users',
         {name: 'pdf', maxCount:1}
     ]),
      async (req, res) => {
-    const { name, email, mobile,qualification, address, work_experience} = req.body;
+    const { name, email, mobile,qualification, address, work_experience,achievement,remarks } = req.body;
     const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
     const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
-    if (!name || !email || !mobile || !qualification|| !address|| !work_experience|| !req.files) {
+
+    if (!name || !email || !mobile || !qualification|| !address|| !work_experience|| !achievement || !remarks|| !req.files) {
         return res.status(400).json({ message: 'All fields (name, email, photo) are required.' });
       }
     try {
@@ -52,9 +53,9 @@ app.post('/users',
 
 
         const result = await pool.query(
-            'INSERT INTO users (name, email, mobile, qualification, address, work_experience, photo, pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            'INSERT INTO users (name, email, mobile, qualification, address, work_experience,achievement,remarks, photo, pdf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9, $10) RETURNING *',
             [
-                name, email, mobile,qualification, address, work_experience,
+                name, email, mobile,qualification, address, work_experience,achievement,remarks,
                  photoFile ? photoFile.buffer.toString('base64') : null,
                  pdfFile ? pdfFile.buffer.toString('base64'): null
                 ]
@@ -80,6 +81,20 @@ app.get('/users', async (req, res) => {
     }
 });
 
+app.get('/users/search/:mobile', async (req, res) => {
+    const mobile = req.params.mobile;
+  
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE mobile = $1', [mobile]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(result.rows[0]);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
 // Get a single user by ID
 app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
@@ -102,7 +117,7 @@ app.put('/users/:id',upload.fields([
 ]), 
     async (req, res) => {
     const { id } = req.params;
-    const { name, email, mobile, qualification, address, work_experience } = req.body;
+    const { name, email, mobile, qualification, address, work_experience,achievement,remarks } = req.body;
     const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
     const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
     if (mobile && !/^\d{10}$/.test(mobile)) {
@@ -126,12 +141,14 @@ app.put('/users/:id',upload.fields([
         const updateQualification= qualification || existingUser.rows[0].qualification;
         const updatedAddress = address || existingUser.rows[0].address;
         const updatedWork_experience= work_experience || existingUser.rows[0].work_experience;
+        const updatedAchievement = achievement || existingUser.rows[0].achievement;
+        const updatedRemarks = remarks  || existingUser.rows[0].remarks ;
         const updatedPhoto = photoFile ? photoFile.buffer.toString('base64') : existingUser.rows[0].photo;
         const updatedPdf = pdfFile ? pdfFile.buffer.toString('base64') : existingUser.rows[0].pdf;
         
         const result = await pool.query(
-            'UPDATE users SET name = $1, email = $2, mobile= $3, qualification=$4, address=$5, work_experience=$6, photo= COALESCE($7, photo), pdf= COALESCE($8, pdf)  WHERE id = $9 RETURNING *',
-            [updatedName, updatedEmail,updatedMobile,updateQualification,updatedAddress,updatedWork_experience, updatedPhoto,updatedPdf, id]
+            'UPDATE users SET name = $1, email = $2, mobile= $3, qualification=$4, address=$5, work_experience=$6,achievement=$7,remarks=$8, photo= COALESCE($9, photo), pdf= COALESCE($10, pdf)  WHERE id = $11 RETURNING *',
+            [updatedName, updatedEmail,updatedMobile,updateQualification,updatedAddress,updatedWork_experience,updatedAchievement,updatedRemarks, updatedPhoto,updatedPdf, id]
         );
       
         res.status(200).json(result.rows[0]);
