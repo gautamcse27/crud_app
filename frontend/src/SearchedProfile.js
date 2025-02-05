@@ -4,9 +4,6 @@ const SearchedProfile = ({ user }) => {
     return (
         <div className="container mt-5">
             <h1 className="text-center mb-4">User Profile</h1>
-            <div className="container">
-            <div className="row justify-content-center">
-            <div className="col-md-8">
             <div className="card shadow">
                 <div className="card-body">
                     <div className="row">
@@ -15,7 +12,7 @@ const SearchedProfile = ({ user }) => {
                                 <img
                                     src={`data:image/jpeg;base64,${user.photo}`}
                                     alt="User"
-                                    className="img-fluid rounded-circle mb-3"
+                                    className="img-fluid rounded mb-3"
                                     style={{ width: '150px', height: '150px' }}
                                 />
                             )}
@@ -37,6 +34,12 @@ const SearchedProfile = ({ user }) => {
                                 <li className="list-group-item">
                                     <strong>Work Experience:</strong> {user.work_experience}
                                 </li>
+                                <li className="list-group-item">
+                                    <strong>Achievement:</strong> {user.achievement}
+                                </li>
+                                <li className="list-group-item">
+                                    <strong>Remarks:</strong> {user.remarks}
+                                </li>
                             </ul>
                             {user.pdf && (
                                 <div className="mt-4">
@@ -53,11 +56,9 @@ const SearchedProfile = ({ user }) => {
                     </div>
                 </div>
             </div>
-            </div>
-            </div>
-        </div>
         </div>
     );
 };
+    
 
 export default SearchedProfile;
