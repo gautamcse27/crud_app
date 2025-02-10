@@ -38,6 +38,55 @@ const UserApp = () => {
     // Create or update a user
     const handleSubmit = async (e) => {
         e.preventDefault();
+         // Check for empty fields with custom error messages
+  if (!name) {
+    setMessage('Please fill the Name field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!email) {
+    setMessage('Please fill the Email field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!mobile) {
+    setMessage('Please fill the Mobile field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!qualification) {
+    setMessage('Please fill the Qualification field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!address) {
+    setMessage('Please fill the Address field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!workExperience) {
+    setMessage('Please fill the Work Experience field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!achievement) {
+    setMessage('Please fill the Achievement field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
+  if (!remarks) {
+    setMessage('Please fill the Remarks field');
+    scrollToTop();
+    setTimeout(() => setMessage(''), 4000);
+    return;
+  }
         
 
         const formData=new FormData();
@@ -82,10 +131,15 @@ const UserApp = () => {
         fetchUsers();
         scrollToTop();
     } catch (error) {
-        setMessage('Error occurred while processing the request.');
-      } finally {
+        if (error.response && error.response.data.error) {
+            setMessage(error.response.data.error); // Show duplicate mobile message if backend returns it
+          }else{
+        setMessage('Error occurred');
+      } 
+        }finally {
         setLoading(false); // Hide spinner
       }
+      scrollToTop();
   setTimeout(() => setMessage(''), 4000);
     };
 
