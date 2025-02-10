@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 // PostgreSQL connection
 const pool = new Pool({
-    user: 'crud_user1',
+    user: 'crud_user',
     host: 'localhost',
     database: 'crud_app',
     password: 'crud@123',
@@ -40,11 +40,7 @@ app.post('/users',
     const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
 
     if (!name || !email || !mobile || !qualification|| !address|| !work_experience|| !achievement || !remarks|| !req.files) {
-<<<<<<< HEAD
-        return res.status(400).json({ message: 'All fields (name, email, photo) are required.' });
-=======
         return res.status(400).json({ message: 'All fields  are required.' });
->>>>>>> f4fb00ad (commit)
       }
     try {
         const existingUser = await pool.query(
