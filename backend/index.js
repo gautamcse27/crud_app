@@ -40,7 +40,11 @@ app.post('/users',
     const pdfFile = req.files['pdf'] ? req.files['pdf'][0]: null;
 
     if (!name || !email || !mobile || !qualification|| !address|| !work_experience|| !achievement || !remarks|| !req.files) {
+<<<<<<< HEAD
         return res.status(400).json({ message: 'All fields (name, email, photo) are required.' });
+=======
+        return res.status(400).json({ message: 'All fields  are required.' });
+>>>>>>> f4fb00ad (commit)
       }
     try {
         const existingUser = await pool.query(
